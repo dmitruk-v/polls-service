@@ -17,14 +17,16 @@ func NewPollStorage(db *pgx.Conn) *PollStorage {
 	}
 }
 
-func (stg *PollStorage) InsertPoll(ctx context.Context, id string, poll schema.Poll) error {
+func (stg *PollStorage) InsertPoll(ctx context.Context, poll schema.Poll) error {
 	q := `
   INSERT INTO polls
-    (poll_id, survey_id, pre_set_values)
+    (survey_id, pre_set_values)
   VALUES
-    ($1, $2, $3)
+    ($1, $2)
+  ON CONFLICT (survey_id) DO
+    UPDATE SET pre_set_values=$2
   `
-	ctag, err := stg.db.Exec(ctx, q, id, poll.SurveyID, poll.PreSetValues)
+	ctag, err := stg.db.Exec(ctx, q, poll.SurveyID, poll.PreSetValues)
 	if err != nil {
 		return err
 	}
@@ -32,7 +34,7 @@ func (stg *PollStorage) InsertPoll(ctx context.Context, id string, poll schema.P
 	return nil
 }
 
-func (stg *PollStorage) GetPollByID(ctx context.Context, id string) (schema.Poll, error) {
+func (stg *PollStorage) GetPollByID(ctx context.Context, id int64) (schema.Poll, error) {
 	poll := schema.Poll{}
 	return poll, nil
 }

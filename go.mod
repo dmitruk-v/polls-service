@@ -6,10 +6,7 @@ require github.com/go-chi/chi/v5 v5.0.8
 
 require github.com/bradfitz/gomemcache v0.0.0-20230124162541-5f7a7d875746
 
-require (
-	github.com/google/uuid v1.3.0
-	github.com/jackc/pgx/v5 v5.3.1
-)
+require github.com/jackc/pgx/v5 v5.3.1
 
 require (
 	github.com/jackc/pgpassfile v1.0.0 // indirect

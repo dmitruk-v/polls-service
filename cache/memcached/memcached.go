@@ -1,4 +1,4 @@
-package cache
+package memcached
 
 import (
 	"fmt"
@@ -7,7 +7,7 @@ import (
 	"github.com/bradfitz/gomemcache/memcache"
 )
 
-func MemcacheConnect(servers ...string) (*memcache.Client, error) {
+func Connect(servers ...string) (*memcache.Client, error) {
 	sl := new(memcache.ServerList)
 	if err := sl.SetServers(servers...); err != nil {
 		return nil, fmt.Errorf("unable to resolve memcached servers: %w", err)

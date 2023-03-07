@@ -1,12 +1,13 @@
 package main
 
 import (
+	"context"
 	"log"
 	"time"
 
-	"github.com/dmitruk-v/4service/app"
-	"github.com/dmitruk-v/4service/cache"
-	"github.com/dmitruk-v/4service/postgres"
+	"github.com/dmitruk-v/4service/cache/memcached"
+	"github.com/dmitruk-v/4service/db/postgres"
+	"github.com/dmitruk-v/4service/web"
 )
 
 func main() {
@@ -16,21 +17,35 @@ func main() {
 }
 
 func run() error {
-	dsn := "postgres://postgres:mysecretpassword@localhost:5432/polls-db"
+	dsn := "postgres://postgres:postgres@localhost:5432/mydb"
 	db := postgres.MustConnectWithRetry(dsn, 10*time.Minute)
+	defer db.Close(context.Background())
+
 	pollStorage := postgres.NewPollStorage(db)
 
-	cacheClient, err := cache.MemcacheConnect("localhost:11211")
+	memcachedClient, err := memcached.Connect("localhost:11211")
 	if err != nil {
 		return err
 	}
-	defer cacheClient.Close()
+	defer memcachedClient.Close()
 
-	cfg := app.AppConfig{}
-	cfg.HTTPServer.Addr = "localhost:8080"
-	cfg.HTTPServer.ReadTimeout = 5 * time.Second
-	cfg.HTTPServer.WriteTimeout = 5 * time.Second
+	pollCacheClient := memcached.NewPollCache(memcachedClient)
 
-	app := app.NewApp(cfg, cacheClient, pollStorage)
-	return app.Run()
+	// TODO: Set Addr from ENV variable
+	webServerCfg := web.ServerConfig{
+		Addr:         "localhost:8080",
+		ReadTimeout:  5 * time.Second,
+		WriteTimeout: 5 * time.Second,
+	}
+
+	clients := web.Clients{
+		CacheClient: pollCacheClient,
+	}
+
+	storages := web.Storages{
+		PollStorage: pollStorage,
+	}
+
+	webServer := web.NewServer(webServerCfg, clients, storages)
+	return webServer.Run()
 }

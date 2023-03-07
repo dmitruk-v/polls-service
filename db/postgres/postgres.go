@@ -35,8 +35,9 @@ func MustConnectWithRetry(dsn string, timeout time.Duration) *pgx.Conn {
 			if err == nil {
 				return conn
 			}
+			log.Println(err)
 		}
-		log.Printf("Connection failed! Retry after %v...\n", delay)
+		log.Printf("Retry after %v...\n", delay)
 		time.Sleep(delay)
 		delay *= 2
 	}

@@ -1,0 +1,5 @@
+FROM alpine:3.16.3
+
+COPY ../bin/polls-service /usr/local/bin/polls-service
+
+CMD [ "/usr/local/bin/polls-service" ]
