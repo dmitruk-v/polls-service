@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"log"
 	"strconv"
 
 	"github.com/bradfitz/gomemcache/memcache"
@@ -49,7 +48,6 @@ func (c *PollCache) SetPoll(poll schema.Poll) error {
 	// TODO: set expiration from ENV variable
 	key := fmt.Sprintf("%v", poll.SurveyID)
 	item := &memcache.Item{Key: key, Value: preVals, Expiration: 24 * 60 * 60}
-	log.Println("---", item.Key)
 	if err := c.client.Set(item); err != nil {
 		return err
 	}

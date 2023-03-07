@@ -31,7 +31,7 @@ func (h *PollHandler) GetPoll(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	w.Write([]byte(fmt.Sprintf("Got poll: %v\n", poll)))
+	w.Write([]byte(fmt.Sprintf("Got poll: %+v\n", poll)))
 }
 
 func (h *PollHandler) CreatePoll(w http.ResponseWriter, r *http.Request) {
@@ -43,6 +43,11 @@ func (h *PollHandler) CreatePoll(w http.ResponseWriter, r *http.Request) {
 	}
 	if err := h.pollStorage.InsertPoll(r.Context(), poll); err != nil {
 		log.Printf("inserting poll, with error: %v\n", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	if err := h.pollCache.SetPoll(poll); err != nil {
+		log.Printf("saving poll to cache, with error: %v\n", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

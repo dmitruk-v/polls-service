@@ -1,0 +1,7 @@
+FROM alpine:3.16.3
+
+COPY ../bin/poll-service /usr/local/bin/poll-service
+
+EXPOSE 8080
+
+CMD [ "/usr/local/bin/poll-service" ]
