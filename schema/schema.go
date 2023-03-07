@@ -1,4 +1,4 @@
-package scheme
+package schema
 
 type Poll struct {
 	SurveyID     int64             `json:"survey_id"`

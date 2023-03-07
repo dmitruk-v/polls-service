@@ -18,14 +18,16 @@ type AppConfig struct {
 }
 
 type App struct {
-	cfg        AppConfig
-	memcClient *memcache.Client
+	cfg         AppConfig
+	cacheClient *memcache.Client
+	pollStorage PollStorage
 }
 
-func NewApp(cfg AppConfig, memcacheClient *memcache.Client) *App {
+func NewApp(cfg AppConfig, cacheClient *memcache.Client, pollStorage PollStorage) *App {
 	return &App{
-		cfg:        cfg,
-		memcClient: memcacheClient,
+		cfg:         cfg,
+		cacheClient: cacheClient,
+		pollStorage: pollStorage,
 	}
 }
 
@@ -47,7 +49,7 @@ func (app *App) Run() error {
 func (app *App) initRoutes() http.Handler {
 	router := chi.NewRouter()
 
-	pollHandler := NewPollHandler(app.memcClient)
+	pollHandler := NewPollHandler(app.cacheClient, app.pollStorage)
 	router.Get("/polls/{poll-id}", pollHandler.GetPoll)
 	router.Post("/polls", pollHandler.CreatePoll)
 
