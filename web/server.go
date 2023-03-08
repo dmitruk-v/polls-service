@@ -15,7 +15,7 @@ type ServerConfig struct {
 }
 
 type Clients struct {
-	CacheClient schema.PollCache
+	PollCache schema.PollCache
 }
 
 type Storages struct {

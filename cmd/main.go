@@ -57,7 +57,7 @@ func run() error {
 	}
 
 	clients := web.Clients{
-		CacheClient: pollCacheClient,
+		PollCache: pollCacheClient,
 	}
 
 	storages := web.Storages{

@@ -8,7 +8,7 @@ import (
 
 func (s *Server) initRoutes() http.Handler {
 	router := chi.NewRouter()
-	pollHandler := NewPollHandler(s.clients.CacheClient, s.storages.PollStorage)
+	pollHandler := NewPollHandler(s.clients.PollCache, s.storages.PollStorage)
 	router.Get("/polls/{survey_id}", pollHandler.GetPoll)
 	router.Post("/polls", pollHandler.CreatePoll)
 	return router
