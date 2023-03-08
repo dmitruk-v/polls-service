@@ -4,21 +4,24 @@ import (
 	"github.com/dmitruk-v/4service/schema"
 )
 
-type StubPollCache struct{}
+type StubPollCache struct {
+	HasSurveyFn func(id string) (bool, error)
+	GetPollFn   func(key string) (schema.Poll, error)
+	SetPollFn   func(poll schema.Poll) error
+}
 
 func NewStubPollCache() *StubPollCache {
 	return &StubPollCache{}
 }
 
 func (c *StubPollCache) HasSurveyID(id string) (bool, error) {
-	return true, nil
+	return c.HasSurveyFn(id)
 }
 
-func (c *StubPollCache) GetPoll(key string) (schema.Poll, error) {
-	var poll schema.Poll
-	return poll, nil
+func (c *StubPollCache) GetPoll(id string) (schema.Poll, error) {
+	return c.GetPollFn(id)
 }
 
 func (c *StubPollCache) SetPoll(poll schema.Poll) error {
-	return nil
+	return c.SetPollFn(poll)
 }

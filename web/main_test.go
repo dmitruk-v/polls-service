@@ -6,12 +6,11 @@ import (
 
 	"github.com/dmitruk-v/4service/cache"
 	"github.com/dmitruk-v/4service/db"
-	"github.com/dmitruk-v/4service/schema"
 )
 
 var (
-	pollCacheStub   schema.PollCache
-	pollStorageStub schema.PollStorage
+	pollCacheStub   *cache.StubPollCache
+	pollStorageStub *db.StubPollStorage
 )
 
 func TestMain(m *testing.M) {

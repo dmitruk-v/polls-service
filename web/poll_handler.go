@@ -54,7 +54,7 @@ func (h *PollHandler) CreatePoll(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if err := h.pollStorage.InsertPoll(r.Context(), poll); err != nil {
-		log.Printf("inserting poll, with error: %v\n", err)
+		log.Printf("inserting poll to database, with error: %v\n", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

@@ -1,12 +1,14 @@
 package web
 
 import (
+	"context"
 	"io"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
 
+	"github.com/dmitruk-v/4service/schema"
 	"github.com/stretchr/testify/require"
 )
 
@@ -24,7 +26,14 @@ func TestCreatePollBadJSON(t *testing.T) {
 }
 
 func TestCreatePollWrongLink(t *testing.T) {
-	var bodyJSON = `{
+	pollStorageStub.InsertPollFn = func(ctx context.Context, poll schema.Poll) error {
+		return nil
+	}
+	pollCacheStub.SetPollFn = func(poll schema.Poll) error {
+		return nil
+	}
+	want := `http://localhost:8080/polls?survey_id=123&%D0%BF-1=%D0%B2-1&%D0%BF-2=%D0%B2-2&%D0%BF-3=%D0%B2-3`
+	bodyJSON := `{
     "survey_id": 123,
     "pre_set_values": {
         "п-11": "в-1",
@@ -38,7 +47,6 @@ func TestCreatePollWrongLink(t *testing.T) {
 	res := httptest.NewRecorder()
 	handler := NewPollHandler(pollCacheStub, pollStorageStub)
 	handler.CreatePoll(res, req)
-	want := `http://localhost:8080/polls?survey_id=123&%D0%BF-1=%D0%B2-1&%D0%BF-2=%D0%B2-2&%D0%BF-3=%D0%B2-3`
 	resBody, err := io.ReadAll(res.Body)
 	require.NoError(t, err)
 	require.Equal(t, http.StatusCreated, res.Code)
