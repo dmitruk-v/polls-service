@@ -8,6 +8,7 @@ type PollStorage interface {
 }
 
 type PollCache interface {
+	HasSurveyID(id string) (bool, error)
 	GetPoll(key string) (Poll, error)
 	SetPoll(poll Poll) error
 }

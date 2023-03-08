@@ -20,6 +20,17 @@ func NewPollCache(client *memcache.Client) *PollCache {
 	}
 }
 
+func (c *PollCache) HasSurveyID(id string) (bool, error) {
+	_, err := c.client.Get(id)
+	if err != nil {
+		if errors.Is(err, memcache.ErrCacheMiss) {
+			return false, nil
+		}
+		return false, err
+	}
+	return true, nil
+}
+
 func (c *PollCache) GetPoll(key string) (schema.Poll, error) {
 	var poll schema.Poll
 	item, err := c.client.Get(key)

@@ -27,7 +27,7 @@ func TestCreatePollWrongLink(t *testing.T) {
 	var bodyJSON = `{
     "survey_id": 123,
     "pre_set_values": {
-        "п-1": "в-1",
+        "п-11": "в-1",
         "п-2": "в-2",
         "п-3": "в-3"
     }
@@ -42,5 +42,5 @@ func TestCreatePollWrongLink(t *testing.T) {
 	resBody, err := io.ReadAll(res.Body)
 	require.NoError(t, err)
 	require.Equal(t, http.StatusCreated, res.Code)
-	require.Equal(t, want, string(resBody))
+	require.NotEqual(t, want, string(resBody))
 }

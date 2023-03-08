@@ -8,7 +8,6 @@ import (
 	"strconv"
 
 	"github.com/dmitruk-v/4service/schema"
-	"github.com/go-chi/chi/v5"
 )
 
 type PollHandler struct {
@@ -25,13 +24,26 @@ func NewPollHandler(pollCache schema.PollCache, pollStorage schema.PollStorage) 
 }
 
 func (h *PollHandler) GetPoll(w http.ResponseWriter, r *http.Request) {
-	surveyID := chi.URLParam(r, "survey_id")
-	poll, err := h.pollCache.GetPoll(surveyID)
+	q := r.URL.Query()
+	surveyID := q.Get("survey_id")
+	// surveyID := chi.URLParam(r, "survey_id")
+	inCache, err := h.pollCache.HasSurveyID(surveyID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	w.Write([]byte(fmt.Sprintf("Got poll: %+v\n", poll)))
+	// Extract from cache
+	if inCache {
+		poll, err := h.pollCache.GetPoll(surveyID)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		w.Write([]byte(fmt.Sprintf("Got poll: %+v\n", poll)))
+		return
+	}
+	// Otherwise extract from database
+	// h.pollStorage.GetPollByID()
 }
 
 func (h *PollHandler) CreatePoll(w http.ResponseWriter, r *http.Request) {
