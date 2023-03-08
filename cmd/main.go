@@ -46,15 +46,12 @@ func run() error {
 		ReadTimeout:  5 * time.Second,
 		WriteTimeout: 5 * time.Second,
 	}
-
 	clients := web.Clients{
 		PollCache: pollCacheClient,
 	}
-
 	storages := web.Storages{
 		PollStorage: pollStorage,
 	}
-
 	webServer := web.NewServer(webServerCfg, clients, storages)
 	return webServer.Run()
 }
