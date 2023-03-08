@@ -34,7 +34,7 @@ func run() error {
 
 	// Init cache
 	// ---------------------------------------------
-	memcachedClient := memcached.MustConnectWithRetry(maxTimeout, config.MemcachedServers...)
+	memcachedClient := memcached.MustConnectWithRetry(config.MemcachedServers, maxTimeout)
 	defer memcachedClient.Close()
 
 	pollCacheClient := memcached.NewPollCache(memcachedClient)

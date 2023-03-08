@@ -22,7 +22,7 @@ func Connect(servers ...string) (*memcache.Client, error) {
 	return memcacheClient, nil
 }
 
-func MustConnectWithRetry(timeout time.Duration, servers ...string) *memcache.Client {
+func MustConnectWithRetry(servers []string, timeout time.Duration) *memcache.Client {
 	timer := time.NewTimer(timeout)
 	delay := time.Second
 	for {
