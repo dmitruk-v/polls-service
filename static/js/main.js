@@ -18,7 +18,7 @@ const Form = ({ fields }) => {
 	return (
 		<form action="#" className="pt-3">
 			{fields.map(item => <FormField key={item.key} label={item.key} value={item.value} />)}
-			<button type="submit" className="btn btn-primary">Submit</button>
+			<button type="submit" className="mt-2 btn btn-primary">Submit</button>
 		</form>
 	)
 }

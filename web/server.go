@@ -23,16 +23,18 @@ type Storages struct {
 }
 
 type Server struct {
-	cfg      ServerConfig
-	clients  Clients
-	storages Storages
+	cfg          ServerConfig
+	clients      Clients
+	storages     Storages
+	htmlRenderer HTMLRenderer
 }
 
-func NewServer(cfg ServerConfig, clients Clients, storages Storages) *Server {
+func NewServer(cfg ServerConfig, clients Clients, storages Storages, htmlRenderer HTMLRenderer) *Server {
 	return &Server{
-		cfg:      cfg,
-		clients:  clients,
-		storages: storages,
+		cfg:          cfg,
+		clients:      clients,
+		storages:     storages,
+		htmlRenderer: htmlRenderer,
 	}
 }
 

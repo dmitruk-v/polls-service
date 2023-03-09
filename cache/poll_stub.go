@@ -10,7 +10,14 @@ type StubPollCache struct {
 }
 
 func NewStubPollCache() *StubPollCache {
-	return &StubPollCache{}
+	return &StubPollCache{
+		GetPollFn: func(surveyID int64) (schema.Poll, error) {
+			return schema.Poll{}, nil
+		},
+		SetPollFn: func(poll schema.Poll) error {
+			return nil
+		},
+	}
 }
 
 func (c *StubPollCache) GetPoll(surveyID int64) (schema.Poll, error) {

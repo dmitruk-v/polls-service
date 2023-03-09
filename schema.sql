@@ -1,8 +1,7 @@
 -- Active: 1678179752474@@127.0.0.1@5432@mydb
 CREATE TABLE IF NOT EXISTS polls (
-	survey_id BIGINT UNIQUE NOT NULL,
+	survey_id BIGINT PRIMARY KEY,
 	pre_set_values JSON NOT NULL
-	PRIMARY KEY (survey_id)
 );
 
 CREATE TABLE IF NOT EXISTS users (

@@ -3,15 +3,15 @@ package schema
 import "fmt"
 
 type ErrPollNotFound struct {
-	pollID int64
+	surveyID int64
 }
 
-func NewErrPollNotFound(pollID int64) *ErrPollNotFound {
+func NewErrPollNotFound(surveyID int64) *ErrPollNotFound {
 	return &ErrPollNotFound{
-		pollID: pollID,
+		surveyID: surveyID,
 	}
 }
 
 func (err *ErrPollNotFound) Error() string {
-	return fmt.Sprintf("poll with id %v is not found", err.pollID)
+	return fmt.Sprintf("poll with survey_id %v is not found", err.surveyID)
 }

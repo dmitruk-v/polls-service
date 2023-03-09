@@ -14,14 +14,16 @@ import (
 
 type PollHandler struct {
 	JsonHandler
-	pollCache   schema.PollCache
-	pollStorage schema.PollStorage
+	pollCache    schema.PollCache
+	pollStorage  schema.PollStorage
+	htmlRenderer HTMLRenderer
 }
 
-func NewPollHandler(pollCache schema.PollCache, pollStorage schema.PollStorage) *PollHandler {
+func NewPollHandler(pollCache schema.PollCache, pollStorage schema.PollStorage, htmlRenderer HTMLRenderer) *PollHandler {
 	return &PollHandler{
-		pollCache:   pollCache,
-		pollStorage: pollStorage,
+		pollCache:    pollCache,
+		pollStorage:  pollStorage,
+		htmlRenderer: htmlRenderer,
 	}
 }
 
@@ -56,7 +58,7 @@ func (h *PollHandler) GetPoll(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-	if err := showTemplate(w, "form.html", poll); err != nil {
+	if err := h.htmlRenderer.ShowTemplate(w, "form.html", poll); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

@@ -12,7 +12,14 @@ type StubPollStorage struct {
 }
 
 func NewStubPollStorage() *StubPollStorage {
-	return &StubPollStorage{}
+	return &StubPollStorage{
+		InsertPollFn: func(ctx context.Context, poll schema.Poll) error {
+			return nil
+		},
+		GetPollByIDFn: func(ctx context.Context, surveyID int64) (schema.Poll, error) {
+			return schema.Poll{}, nil
+		},
+	}
 }
 
 func (stg *StubPollStorage) InsertPoll(ctx context.Context, poll schema.Poll) error {

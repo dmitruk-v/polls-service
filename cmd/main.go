@@ -47,6 +47,10 @@ func run() error {
 		}
 	}()
 
+	// Init HTML-renderer
+	// ---------------------------------------------
+	htmlRenderer := web.NewBaseHTMLRender("./static/templates")
+
 	// Init web-server
 	// ---------------------------------------------
 	webServerCfg := web.ServerConfig{
@@ -60,6 +64,6 @@ func run() error {
 	storages := web.Storages{
 		PollStorage: pollStorage,
 	}
-	webServer := web.NewServer(webServerCfg, clients, storages)
+	webServer := web.NewServer(webServerCfg, clients, storages, htmlRenderer)
 	return webServer.Run()
 }

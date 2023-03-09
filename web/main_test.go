@@ -9,12 +9,16 @@ import (
 )
 
 var (
-	pollCacheStub   *cache.StubPollCache
-	pollStorageStub *db.StubPollStorage
+	pollCacheStub    *cache.StubPollCache
+	pollStorageStub  *db.StubPollStorage
+	htmlRendererStub *StubHTMLRenderer
+	pollHandler      *PollHandler
 )
 
 func TestMain(m *testing.M) {
 	pollCacheStub = cache.NewStubPollCache()
 	pollStorageStub = db.NewStubPollStorage()
+	htmlRendererStub = NewStubHTMLRender()
+	pollHandler = NewPollHandler(pollCacheStub, pollStorageStub, htmlRendererStub)
 	os.Exit(m.Run())
 }
