@@ -5,9 +5,9 @@ import (
 	"log"
 	"time"
 
-	"github.com/dmitruk-v/4service/cache/memcached"
-	"github.com/dmitruk-v/4service/db/postgres"
-	"github.com/dmitruk-v/4service/web"
+	"github.com/dmitruk-v/poll-service/cache/memcached"
+	"github.com/dmitruk-v/poll-service/db/postgres"
+	"github.com/dmitruk-v/poll-service/web"
 )
 
 func main() {
@@ -38,6 +38,14 @@ func run() error {
 	defer memcachedClient.Close()
 
 	pollCacheClient := memcached.NewPollCache(memcachedClient)
+
+	// Init static-server
+	// ---------------------------------------------
+	go func() {
+		if err := web.RunStaticServer(":8081"); err != nil {
+			log.Println(err)
+		}
+	}()
 
 	// Init web-server
 	// ---------------------------------------------

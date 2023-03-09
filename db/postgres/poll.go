@@ -2,8 +2,9 @@ package postgres
 
 import (
 	"context"
+	"errors"
 
-	"github.com/dmitruk-v/4service/schema"
+	"github.com/dmitruk-v/poll-service/schema"
 	"github.com/jackc/pgx/v5"
 )
 
@@ -26,15 +27,27 @@ func (stg *PollStorage) InsertPoll(ctx context.Context, poll schema.Poll) error 
   ON CONFLICT (survey_id) DO
     UPDATE SET pre_set_values=$2
   `
-	ctag, err := stg.db.Exec(ctx, q, poll.SurveyID, poll.PreSetValues)
+	_, err := stg.db.Exec(ctx, q, poll.SurveyID, poll.PreSetValues)
 	if err != nil {
 		return err
 	}
-	_ = ctag
 	return nil
 }
 
-func (stg *PollStorage) GetPollByID(ctx context.Context, id int64) (schema.Poll, error) {
-	poll := schema.Poll{}
+func (stg *PollStorage) GetPollByID(ctx context.Context, surveyID int64) (schema.Poll, error) {
+	q := `
+  SELECT
+    survey_id, pre_set_values
+  FROM polls
+  WHERE survey_id=$1
+  `
+	var poll schema.Poll
+	row := stg.db.QueryRow(ctx, q, surveyID)
+	if err := row.Scan(&poll.SurveyID, &poll.PreSetValues); err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return poll, schema.NewErrPollNotFound(surveyID)
+		}
+		return poll, err
+	}
 	return poll, nil
 }

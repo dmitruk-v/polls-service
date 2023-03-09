@@ -1,23 +1,25 @@
 export POSTGRES_DSN=postgresql://postgres:postgres@localhost:5432/mydb?sslmode=disable&timezone=UTC
 export MEMCACHED=localhost:11211
 
+SERVICE_NAME=poll-service
+
 # GO
 # ----------------------------------------
 
 go-run:
-	go build -o ./bin/poll-service ./cmd/. && ./bin/poll-service
+	go build -o ./bin/${SERVICE_NAME} ./cmd/. && ./bin/${SERVICE_NAME}
 
 go-build:
-	GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o ./bin/poll-service ./cmd/.
+	GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o ./bin/${SERVICE_NAME} ./cmd/.
 
 # DOCKER
 # ----------------------------------------
 
 docker-build: go-build
-	docker build --tag dmitrukv/poll-service:1.0.0 -f ./docker/Dockerfile.dev .
+	docker build --tag dmitrukv/${SERVICE_NAME}:1.0.0 -f ./docker/Dockerfile.dev .
 
 docker-run:
-	docker run --rm -p 8080:8080 dmitrukv/poll-service:1.0.0
+	docker run --rm -p 8080:8080 dmitrukv/${SERVICE_NAME}:1.0.0
   
 # DOCKER-COMPOSE
 # ----------------------------------------

@@ -3,11 +3,10 @@ package memcached
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"strconv"
 
 	"github.com/bradfitz/gomemcache/memcache"
-	"github.com/dmitruk-v/4service/schema"
+	"github.com/dmitruk-v/poll-service/schema"
 )
 
 type PollCache struct {
@@ -20,45 +19,30 @@ func NewPollCache(client *memcache.Client) *PollCache {
 	}
 }
 
-func (c *PollCache) HasSurveyID(id string) (bool, error) {
-	_, err := c.client.Get(id)
-	if err != nil {
-		if errors.Is(err, memcache.ErrCacheMiss) {
-			return false, nil
-		}
-		return false, err
-	}
-	return true, nil
-}
-
-func (c *PollCache) GetPoll(key string) (schema.Poll, error) {
+func (c *PollCache) GetPoll(surveyID int64) (schema.Poll, error) {
 	var poll schema.Poll
-	item, err := c.client.Get(key)
+	id := strconv.Itoa(int(surveyID))
+	item, err := c.client.Get(id)
 	if err != nil {
 		if errors.Is(err, memcache.ErrCacheMiss) {
-			return poll, fmt.Errorf("key not found: %w", err)
+			return poll, schema.NewErrPollNotFound(surveyID)
 		}
 		return poll, err
 	}
-	surveyID, err := strconv.ParseInt(item.Key, 10, 64)
-	if err != nil {
-		return poll, err
-	}
-	poll.SurveyID = surveyID
-	if err := json.Unmarshal(item.Value, &poll.PreSetValues); err != nil {
+	if err := json.Unmarshal(item.Value, &poll); err != nil {
 		return poll, err
 	}
 	return poll, nil
 }
 
 func (c *PollCache) SetPoll(poll schema.Poll) error {
-	preVals, err := json.Marshal(poll.PreSetValues)
+	pollBts, err := json.Marshal(poll)
 	if err != nil {
 		return err
 	}
 	// TODO: set expiration from ENV variable
-	key := fmt.Sprintf("%v", poll.SurveyID)
-	item := &memcache.Item{Key: key, Value: preVals, Expiration: 24 * 60 * 60}
+	key := strconv.Itoa(int(poll.SurveyID))
+	item := &memcache.Item{Key: key, Value: pollBts, Expiration: 24 * 60 * 60}
 	if err := c.client.Set(item); err != nil {
 		return err
 	}

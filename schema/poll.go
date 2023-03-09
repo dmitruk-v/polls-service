@@ -4,12 +4,11 @@ import "context"
 
 type PollStorage interface {
 	InsertPoll(ctx context.Context, poll Poll) error
-	GetPollByID(ctx context.Context, id int64) (Poll, error)
+	GetPollByID(ctx context.Context, surveyID int64) (Poll, error)
 }
 
 type PollCache interface {
-	HasSurveyID(id string) (bool, error)
-	GetPoll(key string) (Poll, error)
+	GetPoll(surveyID int64) (Poll, error)
 	SetPoll(poll Poll) error
 }
 

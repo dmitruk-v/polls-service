@@ -1,4 +1,4 @@
-module github.com/dmitruk-v/4service
+module github.com/dmitruk-v/poll-service
 
 go 1.18
 

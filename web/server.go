@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/dmitruk-v/4service/schema"
+	"github.com/dmitruk-v/poll-service/schema"
 )
 
 type ServerConfig struct {

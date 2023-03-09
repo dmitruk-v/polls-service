@@ -13,12 +13,3 @@ func (h *JsonHandler) readJSON(r *http.Request, val any) error {
 	}
 	return nil
 }
-
-// func (h *JsonHandler) writeJSON(w http.ResponseWriter, val any, code int) error {
-// 	w.Header().Add("Content-Type", "application/json")
-// 	if err := json.NewEncoder(w).Encode(val); err != nil {
-// 		return err
-// 	}
-// 	w.WriteHeader(code)
-// 	return nil
-// }

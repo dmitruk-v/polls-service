@@ -9,7 +9,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/dmitruk-v/4service/schema"
+	"github.com/dmitruk-v/poll-service/schema"
 	"github.com/stretchr/testify/require"
 )
 

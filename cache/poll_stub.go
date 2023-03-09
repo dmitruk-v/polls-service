@@ -1,25 +1,20 @@
 package cache
 
 import (
-	"github.com/dmitruk-v/4service/schema"
+	"github.com/dmitruk-v/poll-service/schema"
 )
 
 type StubPollCache struct {
-	HasSurveyFn func(id string) (bool, error)
-	GetPollFn   func(key string) (schema.Poll, error)
-	SetPollFn   func(poll schema.Poll) error
+	GetPollFn func(surveyID int64) (schema.Poll, error)
+	SetPollFn func(poll schema.Poll) error
 }
 
 func NewStubPollCache() *StubPollCache {
 	return &StubPollCache{}
 }
 
-func (c *StubPollCache) HasSurveyID(id string) (bool, error) {
-	return c.HasSurveyFn(id)
-}
-
-func (c *StubPollCache) GetPoll(id string) (schema.Poll, error) {
-	return c.GetPollFn(id)
+func (c *StubPollCache) GetPoll(surveyID int64) (schema.Poll, error) {
+	return c.GetPollFn(surveyID)
 }
 
 func (c *StubPollCache) SetPoll(poll schema.Poll) error {

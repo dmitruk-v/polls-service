@@ -1,13 +1,15 @@
 package web
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
 	"net/url"
 	"strconv"
 
-	"github.com/dmitruk-v/4service/schema"
+	"github.com/dmitruk-v/poll-service/schema"
+	"github.com/go-chi/chi/v5"
 )
 
 type PollHandler struct {
@@ -24,26 +26,40 @@ func NewPollHandler(pollCache schema.PollCache, pollStorage schema.PollStorage) 
 }
 
 func (h *PollHandler) GetPoll(w http.ResponseWriter, r *http.Request) {
-	q := r.URL.Query()
-	surveyID := q.Get("survey_id")
-	// surveyID := chi.URLParam(r, "survey_id")
-	inCache, err := h.pollCache.HasSurveyID(surveyID)
+	surveyIDParam := chi.URLParam(r, "survey_id")
+	surveyID, err := strconv.ParseInt(surveyIDParam, 10, 64)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	// Extract from cache
-	if inCache {
-		poll, err := h.pollCache.GetPoll(surveyID)
-		if err != nil {
+	var poll schema.Poll
+	var inCache bool
+	var pollNotFoundErr *schema.ErrPollNotFound
+	// Extract poll from cache
+	poll, err = h.pollCache.GetPoll(surveyID)
+	if err != nil {
+		if !errors.As(err, &pollNotFoundErr) {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		w.Write([]byte(fmt.Sprintf("Got poll: %+v\n", poll)))
+		inCache = false
+	}
+	if !inCache {
+		// If absent in cache, extract from database
+		poll, err = h.pollStorage.GetPollByID(r.Context(), surveyID)
+		if err != nil {
+			if errors.As(err, &pollNotFoundErr) {
+				http.Error(w, pollNotFoundErr.Error(), http.StatusInternalServerError)
+				return
+			}
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+	}
+	if err := showTemplate(w, "form.html", poll); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	// Otherwise extract from database
-	// h.pollStorage.GetPollByID()
 }
 
 func (h *PollHandler) CreatePoll(w http.ResponseWriter, r *http.Request) {
@@ -64,11 +80,10 @@ func (h *PollHandler) CreatePoll(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	uri := url.Values{}
-	uri.Add("survey_id", strconv.Itoa(int(poll.SurveyID)))
-	for k, v := range poll.PreSetValues {
-		uri.Add(k, v)
+	for q, a := range poll.PreSetValues {
+		uri.Add(q, a)
 	}
-	result := "http://localhost:8080/polls?" + uri.Encode()
+	result := fmt.Sprintf("http://localhost:8080/polls/%v?%v", poll.SurveyID, uri.Encode())
 	w.WriteHeader(http.StatusCreated)
 	w.Write([]byte(result))
 }

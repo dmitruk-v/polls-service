@@ -13,8 +13,7 @@ import (
 
 const SeedSQL = `
 CREATE TABLE IF NOT EXISTS polls (
-	poll_id BIGSERIAL PRIMARY KEY NOT NULL,
-	survey_id INT UNIQUE NOT NULL,
+	survey_id BIGINT PRIMARY KEY,
 	pre_set_values JSON NOT NULL
 );
 `

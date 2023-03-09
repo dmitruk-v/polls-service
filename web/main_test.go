@@ -4,8 +4,8 @@ import (
 	"os"
 	"testing"
 
-	"github.com/dmitruk-v/4service/cache"
-	"github.com/dmitruk-v/4service/db"
+	"github.com/dmitruk-v/poll-service/cache"
+	"github.com/dmitruk-v/poll-service/db"
 )
 
 var (
