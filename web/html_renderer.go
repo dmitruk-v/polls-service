@@ -1,28 +1,27 @@
 package web
 
 import (
+	"embed"
+	"fmt"
 	"html/template"
 	"io"
-	"path"
 )
 
 type HTMLRenderer interface {
 	ShowTemplate(w io.Writer, name string, data any) error
 }
 
-type BaseHTMLRenderer struct {
-	templatesDir string
-}
+//go:embed templates
+var templatesFS embed.FS
 
-func NewBaseHTMLRender(templatesDir string) *BaseHTMLRenderer {
-	return &BaseHTMLRenderer{
-		templatesDir: templatesDir,
-	}
+type BaseHTMLRenderer struct{}
+
+func NewBaseHTMLRender() *BaseHTMLRenderer {
+	return &BaseHTMLRenderer{}
 }
 
 func (rdr *BaseHTMLRenderer) ShowTemplate(w io.Writer, name string, data any) error {
-	tplFile := path.Join(rdr.templatesDir, name)
-	tpl, err := template.ParseFiles(tplFile)
+	tpl, err := template.ParseFS(templatesFS, fmt.Sprintf("templates/%s", name))
 	if err != nil {
 		return err
 	}

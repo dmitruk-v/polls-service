@@ -21,11 +21,9 @@ const maxTimeout = 10 * time.Minute
 func run() error {
 
 	// Get config from ENV variables
-	// ---------------------------------------------
 	config := ParseEnv()
 
 	// Init database and storages
-	// ---------------------------------------------
 	db := postgres.MustConnectWithRetry(config.PosgresDSN, maxTimeout)
 	defer db.Close(context.Background())
 	postgres.MustSeedString(db, postgres.SeedSQL)
@@ -33,14 +31,12 @@ func run() error {
 	pollStorage := postgres.NewPollStorage(db)
 
 	// Init cache
-	// ---------------------------------------------
 	memcachedClient := memcached.MustConnectWithRetry(config.MemcachedServers, maxTimeout)
 	defer memcachedClient.Close()
 
 	pollCacheClient := memcached.NewPollCache(memcachedClient)
 
 	// Init static-server
-	// ---------------------------------------------
 	go func() {
 		if err := web.RunStaticServer(":8081"); err != nil {
 			log.Println(err)
@@ -48,11 +44,9 @@ func run() error {
 	}()
 
 	// Init HTML-renderer
-	// ---------------------------------------------
-	htmlRenderer := web.NewBaseHTMLRender("./static/templates")
+	htmlRenderer := web.NewBaseHTMLRender()
 
 	// Init web-server
-	// ---------------------------------------------
 	webServerCfg := web.ServerConfig{
 		Addr:         ":8080",
 		ReadTimeout:  5 * time.Second,
