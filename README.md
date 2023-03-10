@@ -31,5 +31,25 @@ make dc-ps
 Application container exposes port 8080, so URL to endpoint is:
 
 ```sh
-http://localhost:8080/polls
+POST http://localhost:8080/polls
+```
+It expects JSON payload, such as:
+
+```json
+{   
+    "survey_id": 5,
+    "pre_set_values": {
+        "Who let the dogs out?": "Police",
+        "В чем смысл жизни?": "В Кузинатре",
+        "Де одружуються бджоли?": "У ЗАГС-і"
+    }
+}
+```
+
+### 5 Step
+
+To stop all running containers:
+
+```sh
+make dc-down
 ```
