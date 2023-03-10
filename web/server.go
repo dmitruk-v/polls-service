@@ -1,6 +1,7 @@
 package web
 
 import (
+	"context"
 	"log"
 	"net/http"
 	"time"
@@ -38,14 +39,20 @@ func NewServer(cfg ServerConfig, clients Clients, storages Storages, htmlRendere
 	}
 }
 
-func (s *Server) Run() error {
+func (s *Server) Run(ctx context.Context) error {
 	server := http.Server{
 		Addr:         s.cfg.Addr,
 		ReadTimeout:  s.cfg.ReadTimeout,
 		WriteTimeout: s.cfg.WriteTimeout,
 		Handler:      s.initRoutes(),
 	}
-	defer server.Close()
+	go func() {
+		<-ctx.Done()
+		log.Println("Closing backend http server...")
+		if err := server.Close(); err != nil {
+			log.Println(err)
+		}
+	}()
 	log.Printf("Server listen at %v\n", s.cfg.Addr)
 	if err := server.ListenAndServe(); err != nil {
 		return err

@@ -3,6 +3,9 @@ package main
 import (
 	"context"
 	"log"
+	"os"
+	"os/signal"
+	"syscall"
 	"time"
 
 	"github.com/dmitruk-v/poll-service/cache/memcached"
@@ -19,7 +22,6 @@ func main() {
 const maxTimeout = 10 * time.Minute
 
 func run() error {
-
 	// Get config from ENV variables
 	config := ParseEnv()
 
@@ -36,9 +38,19 @@ func run() error {
 
 	pollCacheClient := memcached.NewPollCache(memcachedClient)
 
+	// Init exit context
+	exitCh := make(chan os.Signal, 1)
+	signal.Notify(exitCh, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	go func() {
+		<-exitCh
+		cancel()
+	}()
+
 	// Init static-server
 	go func() {
-		if err := web.RunStaticServer(":8081"); err != nil {
+		if err := web.RunStaticServer(ctx, ":8081"); err != nil {
 			log.Println(err)
 		}
 	}()
@@ -59,5 +71,5 @@ func run() error {
 		PollStorage: pollStorage,
 	}
 	webServer := web.NewServer(webServerCfg, clients, storages, htmlRenderer)
-	return webServer.Run()
+	return webServer.Run(ctx)
 }
